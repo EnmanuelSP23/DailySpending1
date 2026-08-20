@@ -5,6 +5,9 @@ const SCOPE = [
   'https://www.googleapis.com/auth/drive.readonly',
 ].join(' ')
 
+let cachedToken = null
+let cachedTokenExp = 0
+
 function getCredentials() {
   const b64 = process.env.GOOGLE_CREDENTIALS_B64
   if (b64) return JSON.parse(Buffer.from(b64, 'base64').toString('utf8'))
@@ -31,6 +34,9 @@ function signJwt(creds) {
 }
 
 async function getAccessToken() {
+  const now = Math.floor(Date.now() / 1000)
+  if (cachedToken && cachedTokenExp > now + 60) return cachedToken
+
   const creds = getCredentials()
   const res = await fetch(creds.token_uri, {
     method: 'POST',
@@ -48,7 +54,9 @@ async function getAccessToken() {
   if (!data.access_token) {
     throw new Error('Token response missing access_token')
   }
-  return data.access_token
+  cachedToken = data.access_token
+  cachedTokenExp = now + (data.expires_in || 3600)
+  return cachedToken
 }
 
 async function api(path, { method = 'GET', body } = {}) {
@@ -70,6 +78,42 @@ async function api(path, { method = 'GET', body } = {}) {
   return res.json()
 }
 
+function encRange(range) {
+  return encodeURIComponent(range)
+}
+
+async function valuesGet(id, range) {
+  return api(`spreadsheets/${id}/values/${encRange(range)}`)
+}
+
+async function valuesUpdate(id, range, values, valueInputOption = 'RAW') {
+  return api(`spreadsheets/${id}/values/${encRange(range)}?valueInputOption=${valueInputOption}`, {
+    method: 'PUT',
+    body: { values },
+  })
+}
+
+async function valuesAppend(id, range, values, valueInputOption = 'USER_ENTERED') {
+  return api(
+    `spreadsheets/${id}/values/${encRange(range)}:append?valueInputOption=${valueInputOption}&insertDataOption=OVERWRITE`,
+    { method: 'POST', body: { values } }
+  )
+}
+
+async function valuesClear(id, range) {
+  return api(`spreadsheets/${id}/values/${encRange(range)}:clear`, { method: 'POST', body: {} })
+}
+
+async function getSpreadsheet(id) {
+  return api(
+    `spreadsheets/${id}?fields=sheets.properties.title,sheets.properties.sheetId,sheets.properties.index,sheets.charts`
+  )
+}
+
+async function batchUpdate(id, requests) {
+  return api(`spreadsheets/${id}:batchUpdate`, { method: 'POST', body: { requests } })
+}
+
 async function driveList(query) {
   const token = await getAccessToken()
   const url = 'https://www.googleapis.com/drive/v3/files?spaces=drive&fields=files(id,name)' +
@@ -84,4 +128,14 @@ async function driveList(query) {
   return res.json()
 }
 
-module.exports = { getCredentials, api, driveList }
+module.exports = {
+  getCredentials,
+  api,
+  valuesGet,
+  valuesUpdate,
+  valuesAppend,
+  valuesClear,
+  getSpreadsheet,
+  batchUpdate,
+  driveList,
+}
