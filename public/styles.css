@@ -7,8 +7,10 @@
     --accent: #22d3ee;
     --accent-2: #818cf8;
     --danger: #f87171;
+    --success: #4ade80;
     --radius: 12px;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --pad-page: clamp(12px, 4vw, 24px);
 }
 
 * {
@@ -17,81 +19,91 @@
     padding: 0;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    font-size: clamp(0.95rem, 1vw + 0.75rem, 1.05rem);
+    line-height: 1.5;
 }
 
 .topbar {
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: #0f172a;
-    padding: 28px 20px;
+    padding: clamp(20px, 4vw, 32px) 20px;
     text-align: center;
 }
 
 .topbar h1 {
-    font-size: 1.9rem;
+    font-size: clamp(1.5rem, 2.5vw + 1rem, 2.1rem);
     font-weight: 800;
     letter-spacing: -0.5px;
 }
 
 .subtitle {
     margin-top: 4px;
-    font-size: 0.95rem;
+    font-size: clamp(0.85rem, 1vw + 0.6rem, 0.95rem);
     opacity: 0.8;
 }
 
 .container {
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
-    padding: 24px 16px 40px;
+    padding: var(--pad-page) var(--pad-page) 40px;
     flex: 1;
 }
 
 .summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: clamp(10px, 2vw, 14px);
     margin-bottom: 24px;
 }
 
 .card {
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: clamp(12px, 2.5vw, 18px);
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
 }
 
 .card-label {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 0.5vw + 0.55rem, 0.8rem);
     text-transform: uppercase;
     letter-spacing: 0.6px;
     color: var(--muted);
+    white-space: nowrap;
 }
 
 .card-value {
-    font-size: 1.35rem;
+    font-size: clamp(1.1rem, 1.5vw + 0.8rem, 1.35rem);
     font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .panel {
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: clamp(16px, 3vw, 22px);
     margin-bottom: 24px;
     box-shadow: var(--shadow);
 }
 
 .panel h2 {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 1vw + 0.7rem, 1.15rem);
     margin-bottom: 14px;
 }
 
@@ -101,28 +113,33 @@ body {
     flex-wrap: wrap;
 }
 
-input {
+#add-form input,
+.filters input {
     background: var(--bg-input);
     border: 1px solid transparent;
     border-radius: 8px;
     color: var(--text);
-    padding: 12px 14px;
+    padding: 13px 14px;
     font-size: 1rem;
-    flex: 1;
-    min-width: 140px;
+    flex: 1 1 150px;
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-input:focus {
+#add-form input:focus,
+.filters input:focus {
     outline: none;
     border-color: var(--accent);
 }
 
-input::placeholder {
+#add-form input::placeholder,
+.filters input::placeholder {
     color: var(--muted);
 }
 
 #add-form input[type="number"] {
-    flex: 0 0 130px;
+    flex: 0 1 150px;
 }
 
 button {
@@ -130,7 +147,7 @@ button {
     color: #0f172a;
     border: none;
     border-radius: 8px;
-    padding: 12px 22px;
+    padding: 13px 22px;
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
@@ -155,7 +172,7 @@ button:active {
 }
 
 .msg.success {
-    color: #4ade80;
+    color: var(--success);
 }
 
 .filters {
@@ -166,11 +183,11 @@ button:active {
 }
 
 .filters input[type="search"] {
-    flex: 2;
+    flex: 2 1 200px;
 }
 
 .filters input[type="month"] {
-    flex: 0 0 150px;
+    flex: 0 1 160px;
 }
 
 .records {
@@ -191,9 +208,10 @@ button:active {
 
 .records .amount {
     font-weight: 700;
-    font-size: 1.05rem;
-    min-width: 90px;
+    font-size: clamp(1rem, 1vw + 0.7rem, 1.1rem);
+    min-width: 0;
     color: var(--accent);
+    flex: 0 0 auto;
 }
 
 .records .desc {
@@ -205,6 +223,7 @@ button:active {
     color: var(--muted);
     font-size: 0.85rem;
     white-space: nowrap;
+    flex: 0 0 auto;
 }
 
 .records .empty {
@@ -224,12 +243,58 @@ button:active {
     font-size: 0.85rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #add-form {
+        flex-direction: column;
+    }
+
+    #add-form input,
+    #add-form input[type="number"] {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    #add-form button {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .filters input[type="search"],
+    .filters input[type="month"] {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .summary {
+        gap: 8px;
+    }
+
+    .card {
+        padding: 10px;
+    }
+
     .records li {
         flex-wrap: wrap;
+        gap: 6px 10px;
+    }
+
+    .records .desc {
+        flex: 1 1 100%;
+        order: 3;
     }
 
     .records .date {
         width: 100%;
+        font-size: 0.8rem;
     }
 }
