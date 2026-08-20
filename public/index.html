@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Spending</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <h1>Daily Spending</h1>
+        <p class="subtitle">Track what you spend, day by day.</p>
+    </header>
+
+    <main class="container">
+        <section class="summary">
+            <div class="card">
+                <span class="card-label">Today</span>
+                <span class="card-value" id="sum-today">$0.00</span>
+            </div>
+            <div class="card">
+                <span class="card-label">This Week</span>
+                <span class="card-value" id="sum-week">$0.00</span>
+            </div>
+            <div class="card">
+                <span class="card-label">This Month</span>
+                <span class="card-value" id="sum-month">$0.00</span>
+            </div>
+            <div class="card">
+                <span class="card-label">All Time</span>
+                <span class="card-value" id="sum-total">$0.00</span>
+            </div>
+        </section>
+
+        <section class="panel add-panel">
+            <h2>Add Spending</h2>
+            <form id="add-form">
+                <input type="number" id="amount" name="amount" step="0.01" min="0.01"
+                       placeholder="Amount" required>
+                <input type="text" id="description" name="description"
+                       placeholder="Description (optional)" maxlength="200">
+                <button type="submit">Add</button>
+            </form>
+            <p id="form-msg" class="msg" hidden></p>
+        </section>
+
+        <section class="panel">
+            <h2>Records</h2>
+            <div class="filters">
+                <input type="search" id="search" placeholder="Search description...">
+                <input type="month" id="month-filter">
+            </div>
+            <ul class="records" id="records"></ul>
+            <p id="empty-msg" class="empty" hidden>No spending recorded yet.</p>
+        </section>
+    </main>
+
+    <footer class="foot">Stored in your Google Sheet &middot; Data never leaves Google.</footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
