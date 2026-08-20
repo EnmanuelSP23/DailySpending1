@@ -1,15 +1,15 @@
 :root {
-    --bg: #0f172a;
-    --bg-card: #1e293b;
-    --bg-input: #334155;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #22d3ee;
-    --accent-2: #818cf8;
-    --danger: #f87171;
-    --success: #4ade80;
-    --radius: 12px;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e6e8ec;
+    --text: #16181d;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
     --pad-page: clamp(12px, 4vw, 24px);
 }
 
@@ -24,41 +24,53 @@ html {
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    font-size: clamp(0.95rem, 1vw + 0.75rem, 1.05rem);
+    font-size: 15px;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
 }
 
 .topbar {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #0f172a;
-    padding: clamp(20px, 4vw, 32px) 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: clamp(18px, 4vw, 28px) 20px;
     text-align: center;
 }
 
 .topbar h1 {
-    font-size: clamp(1.5rem, 2.5vw + 1rem, 2.1rem);
+    font-size: clamp(1.35rem, 2vw + 0.9rem, 1.8rem);
     font-weight: 800;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.03em;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topbar h1::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
 }
 
 .subtitle {
     margin-top: 4px;
-    font-size: clamp(0.85rem, 1vw + 0.6rem, 0.95rem);
-    opacity: 0.8;
+    font-size: 0.9rem;
+    color: var(--muted);
 }
 
 .container {
     width: 100%;
     max-width: 760px;
     margin: 0 auto;
-    padding: var(--pad-page) var(--pad-page) 40px;
+    padding: var(--pad-page) var(--pad-page) 48px;
     flex: 1;
 }
 
@@ -70,9 +82,10 @@ body {
 }
 
 .card {
-    background: var(--bg-card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: clamp(12px, 2.5vw, 18px);
+    padding: clamp(14px, 2.5vw, 18px);
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
@@ -81,21 +94,24 @@ body {
 }
 
 .card-label {
-    font-size: clamp(0.7rem, 0.5vw + 0.55rem, 0.8rem);
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.08em;
     color: var(--muted);
     white-space: nowrap;
 }
 
 .card-value {
-    font-size: clamp(1.1rem, 1.5vw + 0.8rem, 1.35rem);
+    font-size: clamp(1.2rem, 1.5vw + 0.9rem, 1.45rem);
     font-weight: 700;
+    letter-spacing: -0.02em;
     overflow-wrap: anywhere;
 }
 
 .panel {
-    background: var(--bg-card);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: clamp(16px, 3vw, 22px);
     margin-bottom: 24px;
@@ -103,7 +119,9 @@ body {
 }
 
 .panel h2 {
-    font-size: clamp(1rem, 1vw + 0.7rem, 1.15rem);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
     margin-bottom: 14px;
 }
 
@@ -115,27 +133,30 @@ body {
 
 #add-form input,
 .filters input {
-    background: var(--bg-input);
-    border: 1px solid transparent;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text);
-    padding: 13px 14px;
-    font-size: 1rem;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
     flex: 1 1 150px;
     min-width: 0;
     -webkit-appearance: none;
     appearance: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 #add-form input:focus,
 .filters input:focus {
     outline: none;
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 #add-form input::placeholder,
 .filters input::placeholder {
-    color: var(--muted);
+    color: #9ca3af;
 }
 
 #add-form input[type="number"] {
@@ -144,22 +165,23 @@ body {
 
 button {
     background: var(--accent);
-    color: #0f172a;
+    color: #ffffff;
     border: none;
     border-radius: 8px;
-    padding: 13px 22px;
-    font-size: 1rem;
-    font-weight: 700;
+    padding: 12px 22px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
-    transition: transform 0.08s ease, filter 0.15s ease;
+    transition: background 0.15s ease, transform 0.08s ease;
 }
 
 button:hover {
-    filter: brightness(1.1);
+    background: #4338ca;
 }
 
 button:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
 .msg {
@@ -178,7 +200,7 @@ button:active {
 .filters {
     display: flex;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 6px;
     flex-wrap: wrap;
 }
 
@@ -192,31 +214,33 @@ button:active {
 
 .records {
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
 .records li {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--bg-input);
-    border-radius: 8px;
-    padding: 12px 14px;
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--border);
+}
+
+.records li:last-child {
+    border-bottom: none;
 }
 
 .records .amount {
     font-weight: 700;
-    font-size: clamp(1rem, 1vw + 0.7rem, 1.1rem);
-    min-width: 0;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
     color: var(--accent);
     flex: 0 0 auto;
+    min-width: 0;
 }
 
 .records .desc {
     flex: 1;
     overflow-wrap: anywhere;
+    color: var(--text);
 }
 
 .records .date {
@@ -226,21 +250,19 @@ button:active {
     flex: 0 0 auto;
 }
 
-.records .empty {
-    color: var(--muted);
-}
-
 .empty {
     color: var(--muted);
     text-align: center;
-    padding: 20px 0;
+    padding: 24px 0;
 }
 
 .foot {
     text-align: center;
-    padding: 18px;
+    padding: 20px;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
 }
 
 @media (max-width: 600px) {
@@ -260,7 +282,7 @@ button:active {
 
     #add-form button {
         width: 100%;
-        padding: 14px;
+        padding: 13px;
     }
 
     .filters {
@@ -280,12 +302,12 @@ button:active {
     }
 
     .card {
-        padding: 10px;
+        padding: 12px;
     }
 
     .records li {
         flex-wrap: wrap;
-        gap: 6px 10px;
+        gap: 4px 10px;
     }
 
     .records .desc {
