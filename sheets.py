@@ -17,8 +17,13 @@ def _load_credentials_dict():
     env = os.environ.get("GOOGLE_CREDENTIALS_JSON")
     if env:
         return json.loads(env)
-    with open("credentials.json", "r", encoding="utf-8") as file:
-        return json.load(file)
+    if os.path.exists("credentials.json"):
+        with open("credentials.json", "r", encoding="utf-8") as file:
+            return json.load(file)
+    raise RuntimeError(
+        "Google credentials not found. Set the GOOGLE_CREDENTIALS_B64 "
+        "environment variable (base64 of credentials.json)."
+    )
 
 
 def connect_to_sheet():
