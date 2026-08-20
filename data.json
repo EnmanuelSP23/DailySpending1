@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2026-01-30",
+    "time": "22:37",
+    "amount": 15.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-30",
+    "time": "22:37",
+    "amount": 12.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-30",
+    "time": "22:50",
+    "amount": 12.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-30",
+    "time": "22:51",
+    "amount": 18.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-30",
+    "time": "22:54",
+    "amount": 24.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-30",
+    "time": "22:55",
+    "amount": 22.0,
+    "exported": true
+  },
+  {
+    "date": "2026-01-31",
+    "time": "22:06",
+    "amount": 160.0,
+    "exported": true
+  },
+  {
+    "date": "2026-08-19",
+    "time": "23:07",
+    "amount": 50.0,
+    "description": "Lunch at cafe",
+    "exported": true
+  },
+  {
+    "date": "2026-08-19",
+    "time": "23:08",
+    "amount": 25.0,
+    "description": "Groceries",
+    "exported": true
+  },
+]
