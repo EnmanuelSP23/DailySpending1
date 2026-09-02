@@ -30,9 +30,9 @@
                 <span class="card-label">This Month</span>
                 <span class="card-value" id="sum-month">$0.00</span>
             </div>
-            <div class="card">
-                <span class="card-label">All Time</span>
-                <span class="card-value" id="sum-total">$0.00</span>
+            <div class="card card-earnings">
+                <span class="card-label">Earnings This Week</span>
+                <span class="card-value" id="sum-earnings">$0.00</span>
             </div>
         </section>
 
@@ -48,19 +48,34 @@
             <p id="form-msg" class="msg" hidden></p>
         </section>
 
+        <section class="panel add-panel">
+            <h2>Add Earnings</h2>
+            <form id="earnings-form">
+                <input type="number" id="earn-amount" name="amount" step="0.01" min="0.01"
+                       placeholder="Amount" required>
+                <input type="date" id="earn-date" name="date" required>
+                <button type="submit">Add Earnings</button>
+            </form>
+            <p id="earn-form-msg" class="msg" hidden></p>
+        </section>
+
         <section class="panel">
-            <h2>Records</h2>
+            <h2>Spending Flow</h2>
             <div class="filters">
                 <input type="search" id="search" placeholder="Search description...">
                 <input type="month" id="month-filter">
             </div>
-            <ul class="records" id="records"></ul>
+            <div id="sankey-container">
+                <svg id="sankey"></svg>
+            </div>
             <p id="empty-msg" class="empty" hidden>No spending recorded yet.</p>
         </section>
     </main>
 
     <footer class="foot">Stored in your Google Sheet &middot; Data never leaves Google.</footer>
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

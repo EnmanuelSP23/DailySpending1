@@ -109,6 +109,10 @@ body {
     overflow-wrap: anywhere;
 }
 
+.card-earnings {
+    border-left: 3px solid var(--success);
+}
+
 .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -125,13 +129,15 @@ body {
     margin-bottom: 14px;
 }
 
-#add-form {
+#add-form,
+#earnings-form {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
 #add-form input,
+#earnings-form input,
 .filters input {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -148,6 +154,7 @@ body {
 }
 
 #add-form input:focus,
+#earnings-form input:focus,
 .filters input:focus {
     outline: none;
     border-color: var(--accent);
@@ -155,11 +162,13 @@ body {
 }
 
 #add-form input::placeholder,
+#earnings-form input::placeholder,
 .filters input::placeholder {
     color: #9ca3af;
 }
 
-#add-form input[type="number"] {
+#add-form input[type="number"],
+#earnings-form input[type="number"] {
     flex: 0 1 150px;
 }
 
@@ -212,42 +221,17 @@ button:active {
     flex: 0 1 160px;
 }
 
-.records {
-    list-style: none;
+#sankey-container {
+    width: 100%;
+    overflow-x: auto;
 }
 
-.records li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 2px;
-    border-bottom: 1px solid var(--border);
+#sankey-container svg {
+    display: block;
 }
 
-.records li:last-child {
-    border-bottom: none;
-}
-
-.records .amount {
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: -0.01em;
-    color: var(--accent);
-    flex: 0 0 auto;
-    min-width: 0;
-}
-
-.records .desc {
-    flex: 1;
-    overflow-wrap: anywhere;
-    color: var(--text);
-}
-
-.records .date {
-    color: var(--muted);
-    font-size: 0.85rem;
-    white-space: nowrap;
-    flex: 0 0 auto;
+#sankey {
+    width: 100%;
 }
 
 .empty {
@@ -270,17 +254,21 @@ button:active {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    #add-form {
+    #add-form,
+    #earnings-form {
         flex-direction: column;
     }
 
     #add-form input,
-    #add-form input[type="number"] {
+    #add-form input[type="number"],
+    #earnings-form input,
+    #earnings-form input[type="number"] {
         flex: 1 1 auto;
         width: 100%;
     }
 
-    #add-form button {
+    #add-form button,
+    #earnings-form button {
         width: 100%;
         padding: 13px;
     }
@@ -303,20 +291,5 @@ button:active {
 
     .card {
         padding: 12px;
-    }
-
-    .records li {
-        flex-wrap: wrap;
-        gap: 4px 10px;
-    }
-
-    .records .desc {
-        flex: 1 1 100%;
-        order: 3;
-    }
-
-    .records .date {
-        width: 100%;
-        font-size: 0.8rem;
     }
 }

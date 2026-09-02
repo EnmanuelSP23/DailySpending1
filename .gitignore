@@ -1,6 +1,7 @@
 __pycache__/
 venv/
 credentials.json
+GOOGLE_CREDENTIALS_B64.txt
 node_modules/
 .netlify/
 .netlify/*
