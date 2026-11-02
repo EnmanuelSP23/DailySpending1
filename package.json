@@ -5,7 +5,10 @@
   "description": "Daily spending tracker backed by Google Sheets",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node --test test/*.test.js",
+    "test:api": "node --test test/records.test.js",
+    "test:browser": "node --test test/browser.test.js"
   },
   "dependencies": {
     "express": "^5.2.1",

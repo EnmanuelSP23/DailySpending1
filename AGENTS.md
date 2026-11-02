@@ -23,7 +23,7 @@ Required in Netlify (or locally via `netlify dev`):
 
 Auto-created on first request:
 
-- **All Data** — Master tab with columns: Amount, Date, Description.
+- **All Data** — Master tab with columns: Amount, Date, Description, Category.
 - **Stats** — Dashboard with formulas + charts (auto-generated).
 - **Monthly tabs** — Created per month (e.g., "Sep 2026") with same columns.
 
@@ -37,7 +37,7 @@ npm install
 npx netlify dev
 ```
 
-No build step. No test suite. No linting configured.
+No build step. `npm test` runs API and Chromium UI tests against fake Sheets storage; `npm run test:api` needs no browser. Browser tests use the sibling product-scrapping-bundle Playwright module, or PLAYWRIGHT_MODULE. No linting configured.
 
 ## Deployment
 

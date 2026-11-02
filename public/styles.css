@@ -153,7 +153,23 @@ body {
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+#add-form select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 12px 14px;
+    font: inherit;
+    flex: 1 1 200px;
+    min-width: 0;
+}
+.flow-note { color: var(--muted); margin-bottom: 12px; }
+#transfer-summary { color: var(--muted); margin: 8px 0; }
+#transfer-list { padding-left: 20px; overflow-wrap: anywhere; }
+#transfer-list li { padding: 4px 0; }
+
 #add-form input:focus,
+#add-form select:focus,
 #earnings-form input:focus,
 .filters input:focus {
     outline: none;
@@ -260,6 +276,7 @@ button:active {
     }
 
     #add-form input,
+    #add-form select,
     #add-form input[type="number"],
     #earnings-form input,
     #earnings-form input[type="number"] {

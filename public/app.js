@@ -53,6 +53,7 @@ function renderSummary() {
     let sumToday = 0, sumWeek = 0, sumMonth = 0;
 
     for (const r of allRecords) {
+        if (r.category === 'Transfers') continue;
         const d = datePart(r.date);
         const amount = parseFloat(r.amount) || 0;
         if (d === today) sumToday += amount;
@@ -91,7 +92,7 @@ function visibleRecords() {
     return allRecords.filter((r) => {
         const d = datePart(r.date);
         if (month && d.slice(0, 7) !== month) return false;
-        if (q && !(r.description || '').toLowerCase().includes(q)) return false;
+        if (q && !`${r.category || 'Other'} ${r.description || ''}`.toLowerCase().includes(q)) return false;
         return true;
     }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
@@ -100,21 +101,31 @@ function renderSankey() {
     const container = document.getElementById('sankey-container');
     const svgEl = document.getElementById('sankey');
     const empty = document.getElementById('empty-msg');
-    const records = visibleRecords();
+    const visible = visibleRecords();
+    const transfers = visible.filter(r => r.category === 'Transfers');
+    document.getElementById('transfer-summary').textContent = `Transfers (filtered): ${fmtAmount(transfers.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0))} · ${transfers.length} entries — excluded from expenses`;
+    const list = document.getElementById('transfer-list');
+    list.replaceChildren(...transfers.map(r => {
+        const li = document.createElement('li');
+        li.textContent = `${r.date} · ${fmtAmount(r.amount)}${r.description ? ' · ' + r.description : ''}`;
+        return li;
+    }));
+    const records = visible.filter(r => r.category !== 'Transfers');
 
     d3.select(svgEl).selectAll('*').remove();
 
     if (records.length === 0) {
         svgEl.setAttribute('width', 0);
         svgEl.setAttribute('height', 0);
-        empty.hidden = allRecords.length > 0;
+        empty.textContent = 'No expenses match these filters.';
+        empty.hidden = false;
         return;
     }
     empty.hidden = true;
 
     const cats = {};
     for (const r of records) {
-        const key = (r.description || '').trim() || 'Uncategorized';
+        const key = r.category || 'Other';
         cats[key] = (cats[key] || 0) + (parseFloat(r.amount) || 0);
     }
 
@@ -230,6 +241,7 @@ async function init() {
         e.preventDefault();
         const amount = document.getElementById('amount');
         const description = document.getElementById('description');
+        const category = document.getElementById('category');
 
         try {
             const res = await fetch('/api/records', {
@@ -238,6 +250,7 @@ async function init() {
                 body: JSON.stringify({
                     amount: amount.value,
                     description: description.value,
+                    category: category.value,
                     date: localStamp(),
                 }),
             });
@@ -246,6 +259,7 @@ async function init() {
 
             amount.value = '';
             description.value = '';
+            category.value = '';
             await loadRecords();
             renderSummary();
             renderSankey();

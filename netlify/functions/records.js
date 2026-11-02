@@ -10,7 +10,16 @@ const {
 const SPREADSHEET_NAME = 'Daily Spending'
 const ALL_DATA = 'All Data'
 const STATS = 'Stats'
-const HEADERS = ['Amount', 'Date', 'Description']
+const HEADERS = ['Amount', 'Date', 'Description', 'Category']
+const CATEGORIES = ['Food & Drinks', 'Transportation', 'Groceries', 'Shopping', 'Bills', 'Health', 'Entertainment', 'Family & Gifts', 'Transfers', 'Other']
+
+async function ensureHeaders(id, title) {
+  const range = `'${title}'!A1:D1`
+  const got = await valuesGet(id, range)
+  if (JSON.stringify((got.values || [])[0]) !== JSON.stringify(HEADERS)) {
+    await valuesUpdate(id, range, [HEADERS])
+  }
+}
 
 async function getSpreadsheetId() {
   if (process.env.SPREADSHEET_ID) return process.env.SPREADSHEET_ID
@@ -51,31 +60,31 @@ async function ensureAllData(metaData, id) {
     }
   }
 
-  const got = await valuesGet(id, `'${ALL_DATA}'!A1:C1`)
-  if (!got.values || got.values.length === 0) {
-    await valuesUpdate(id, `'${ALL_DATA}'!A1:C1`, [HEADERS])
-  }
+  await ensureHeaders(id, ALL_DATA)
   return tab
 }
 
 function buildStatsGrid() {
   const rows = []
   const push = (a, b) => rows.push([a === undefined ? '' : a, b === undefined ? '' : b])
-  const dayRegex = '"^\\d{4}-\\d{2}-\\d{2}"'
-  const monthRegex = '"^\\d{4}-\\d{2}"'
+  const amounts = "'All Data'!$A$2:$A$10000"
+  const dates = "'All Data'!$B$2:$B$10000"
+  const categories = "'All Data'!$D$2:$D$10000"
+  // Dates are RAW text timestamps, not Sheets serial dates. Match prefixes explicitly.
+  const expenseSum = (date, length) => `SUMPRODUCT(${amounts},--(${categories}<>"Transfers"),--(LEFT(${dates},${length})=TEXT(${date},"${length === 7 ? 'yyyy-mm' : 'yyyy-mm-dd'}")))`
 
   push('Daily Spending - Stats', '')
   push('', '')
-  push('All Time Total', "=SUM('All Data'!$A$2:$A$10000)")
-  push('This Month', `=SUMIFS('All Data'!$A$2:$A$10000,ARRAYFORMULA(REGEXEXTRACT('All Data'!$B$2:$B$10000,${monthRegex})),TEXT(TODAY(),"YYYY-MM"))`)
-  push('Entries', "=COUNT('All Data'!$A$2:$A$10000)")
+  push('All Time Expenses', `=SUMIF(${categories},"<>Transfers",${amounts})`)
+  push('This Month', `=${expenseSum('TODAY()', 7)}`)
+  push('Expense Entries', `=COUNTIFS(${amounts},">0",${categories},"<>Transfers")`)
   push('', '')
   push('Monthly Totals', '')
   push('Month', 'Total')
   for (let m = 0; m < 6; m++) {
     push(
       `=TEXT(EDATE(DATE(YEAR(TODAY()),MONTH(TODAY()),1),-${m}),"MMM YYYY")`,
-      `=SUMIFS('All Data'!$A$2:$A$10000,ARRAYFORMULA(REGEXEXTRACT('All Data'!$B$2:$B$10000,${monthRegex})),TEXT(EDATE(DATE(YEAR(TODAY()),MONTH(TODAY()),1),-${m}),"YYYY-MM"))`
+      `=${expenseSum(`EDATE(TODAY(),-${m})`, 7)}`
     )
   }
   push('', '')
@@ -84,14 +93,14 @@ function buildStatsGrid() {
   for (let d = 1; d <= 31; d++) {
     push(
       d,
-      `=SUMIFS('All Data'!$A$2:$A$10000,ARRAYFORMULA(REGEXEXTRACT('All Data'!$B$2:$B$10000,${dayRegex})),TEXT(DATE(YEAR(TODAY()),MONTH(TODAY()),${d}),"YYYY-MM-DD"))`
+      `=IF(${d}>DAY(EOMONTH(TODAY(),0)),0,${expenseSum(`DATE(YEAR(TODAY()),MONTH(TODAY()),${d})`, 10)})`
     )
   }
   push('', '')
   push('Top Spending', '')
   push('', '')
   push(
-    `=QUERY('All Data'!$A$2:$C$10000,"select C, sum(A) where C is not null and C <> '' group by C order by sum(A) desc limit 5 label C 'Description', sum(A) 'Total'",-1)`,
+    `=IFERROR(QUERY({ARRAYFORMULA(IF(${categories}="","Other",${categories})),${amounts}},"select Col1, sum(Col2) where Col2 is not null and Col1 <> 'Transfers' group by Col1 order by sum(Col2) desc limit 5 label Col1 'Category', sum(Col2) 'Total'",0),"No expenses")`,
     ''
   )
   return rows
@@ -191,9 +200,12 @@ async function ensureStats(metaData, id) {
   const tab = findTab(metaData, STATS)
 
   if (tab) {
-    const got = await valuesGet(id, `'${STATS}'!A1:B5`)
-    if (!got.values || got.values.length === 0) {
-      await valuesUpdate(id, `'${STATS}'!A1:B52`, buildStatsGrid(), 'USER_ENTERED')
+    const got = await valuesGet(id, `'${STATS}'!A1:B52`, 'FORMULA')
+    const expected = buildStatsGrid()
+    const current = got.values || []
+    // B52 is QUERY output, not an authored cell. FORMULA rendering retains spill values.
+    if (expected.some((row, r) => row.some((value, c) => !(r === 51 && c === 1) && value !== ((current[r] || [])[c] ?? '')))) {
+      await valuesUpdate(id, `'${STATS}'!A1:B52`, expected, 'USER_ENTERED')
     }
     try {
       await ensureCharts(id, tab, metaData)
@@ -216,10 +228,13 @@ async function ensureStats(metaData, id) {
 
 async function ensureMonthTab(metaData, id, monthName) {
   let tab = findTab(metaData, monthName)
-  if (tab) return tab
+  if (tab) {
+    await ensureHeaders(id, monthName)
+    return tab
+  }
   const res = await batchUpdate(id, [{ addSheet: { properties: { title: monthName } } }])
   const sheetId = res.replies[0].addSheet.properties.sheetId
-  await valuesUpdate(id, `'${monthName}'!A1:C1`, [HEADERS])
+  await ensureHeaders(id, monthName)
   return { properties: { sheetId, title: monthName } }
 }
 
@@ -250,14 +265,23 @@ function bad(message, statusCode = 400) {
 
 exports.handler = async (event) => {
   try {
+    const method = event.httpMethod
+    let body
+    if (method === 'POST') {
+      try { body = JSON.parse(event.body || '{}') } catch { return bad('body must be valid JSON') }
+      if (!body || typeof body !== 'object' || Array.isArray(body)) return bad('body must be an object')
+      if (!CATEGORIES.includes(body.category)) return bad('category must be an approved category')
+      if (!['string', 'number'].includes(typeof body.amount) || !Number.isFinite(Number(body.amount)) || Number(body.amount) <= 0) return bad('amount must be a positive number')
+      if (typeof body.date !== 'string' || !/^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2})?$/.test(body.date.trim())) return bad('date is required (YYYY-MM-DD HH:mm)')
+      if (body.description !== undefined && typeof body.description !== 'string') return bad('description must be a string')
+    } else if (method !== 'GET') return bad('method not allowed', 405)
     const id = await getSpreadsheetId()
     const metaData = await getSpreadsheet(id)
-    const method = event.httpMethod
 
     if (method === 'GET') {
       await ensureAllData(metaData, id)
       await ensureStats(metaData, id)
-      const res = await valuesGet(id, `'${ALL_DATA}'!A:C`)
+      const res = await valuesGet(id, `'${ALL_DATA}'!A:D`)
       const rows = res.values || []
       const records = rows
         .slice(1)
@@ -266,13 +290,13 @@ exports.handler = async (event) => {
           amount: parseFloat(r[0]),
           date: r[1] || '',
           description: r[2] || '',
+          category: r[3] || 'Other',
         }))
       return ok({ records })
     }
 
     if (method === 'POST') {
-      const body = JSON.parse(event.body || '{}')
-      const amount = parseFloat(body.amount)
+      const amount = Number(body.amount)
       if (!Number.isFinite(amount) || amount <= 0) {
         return bad('amount must be a positive number')
       }
@@ -290,10 +314,10 @@ exports.handler = async (event) => {
         await ensureMonthTab(metaData, id, monthName)
       }
 
-      const row = [amount, date, description]
-      await valuesAppend(id, `'${ALL_DATA}'!A:C`, [row], 'RAW')
+      const row = [amount, date, description, body.category]
+      await valuesAppend(id, `'${ALL_DATA}'!A:D`, [row], 'RAW')
       if (monthName) {
-        await valuesAppend(id, `'${monthName}'!A:C`, [row], 'RAW')
+        await valuesAppend(id, `'${monthName}'!A:D`, [row], 'RAW')
       }
       return ok({ ok: true })
     }

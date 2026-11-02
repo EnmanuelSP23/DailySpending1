@@ -5,3 +5,4 @@ GOOGLE_CREDENTIALS_B64.txt
 node_modules/
 .netlify/
 .netlify/*
+backups/

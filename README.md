@@ -99,4 +99,20 @@ netlify deploy --prod
 ## API
 
 - `GET /api/records` — Fetch all spending records
-- `POST /api/records` — Add a new record (JSON body: `amount`, `date`, `description`)
+- `POST /api/records` — Add a record: positive `amount`, local `date` (`YYYY-MM-DD HH:mm`), required `category`, optional `description` (notes).
+
+## Categories and transfers
+
+Choose Food & Drinks, Transportation, Groceries, Shopping, Bills, Health, Entertainment, Family & Gifts, Transfers, or Other. Category is validated by the API. Notes remain optional and searchable; category names are searchable too.
+
+Sheets keep Amount (A), Date (B), Description (C), and Category (D). Legacy rows with no category read as Other. Headers and outdated Stats formulas upgrade on access; existing monthly headers upgrade when used. Stats and the website group expenses by category and exclude Transfers from expense totals and charts. Transfers remain in the data and appear in a separate searchable list and filtered total on the website. Summary cards are not affected by chart filters.
+
+## Tests
+
+- `npm run test:api`: isolated API/schema tests, no Google credentials or network.
+- `npm run test:browser`: real Chromium UI tests with isolated in-memory Sheets storage and local chart fixtures. No real spreadsheet writes.
+- `npm test`: both suites.
+
+Browser tests use Playwright from the sibling `product-scrapping-bundle/node_modules/playwright` installation on this machine. On another machine, install Playwright/Chromium for testing and set `PLAYWRIGHT_MODULE` to the absolute path to its module. Playwright is not a runtime dependency.
+
+Code changes do not automatically deploy the hosted website. Deploy frontend and functions together after verification.

@@ -82,8 +82,8 @@ function encRange(range) {
   return encodeURIComponent(range)
 }
 
-async function valuesGet(id, range) {
-  return api(`spreadsheets/${id}/values/${encRange(range)}`)
+async function valuesGet(id, range, valueRenderOption = 'FORMATTED_VALUE') {
+  return api(`spreadsheets/${id}/values/${encRange(range)}?valueRenderOption=${encodeURIComponent(valueRenderOption)}`)
 }
 
 async function valuesUpdate(id, range, values, valueInputOption = 'RAW') {
